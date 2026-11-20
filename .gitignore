@@ -221,3 +221,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+weights/
+work/
+*.pt
+*.ts
+*.pkl
+*.tar
