@@ -1,0 +1,14 @@
+# torch is capped because the INT8 code uses torch.ao.quantization, which PyTorch plans to remove in 2.10
+torch>=2.6,<2.10
+torchvision>=0.21,<0.25
+numpy
+pandas
+scikit-learn
+nltk
+pillow
+matplotlib
+sentence-transformers
+gradio
+gdown
+datasets
+huggingface_hub

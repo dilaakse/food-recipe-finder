@@ -1,0 +1,31 @@
+query_id,query,dish
+1,pizza recipe,pizza
+2,vegetarian pizza,pizza
+3,lasagna recipe,lasagna
+4,vegan chocolate cake,chocolate_cake
+5,omelette recipe,omelette
+6,quick omelette,omelette
+7,easy tacos recipe,tacos
+8,quick pizza under 30 minutes,pizza
+9,piza recipe,pizza
+10,classic hamburger recipe,hamburger
+11,juicy beef burger on the grill,hamburger
+12,vegetarian burger,hamburger
+13,fluffy pancakes,pancakes
+14,pancakes under 20 minutes,pancakes
+15,vegan pancakes,pancakes
+16,homemade vanilla ice cream,ice_cream
+17,chocolate ice cream,ice_cream
+18,dairy free ice cream,ice_cream
+19,something sweet and cold,ice_cream
+20,crispy french fries,french_fries
+21,oven baked french fries,french_fries
+22,omelette with mushrooms,omelette
+23,easy chocolate cake,chocolate_cake
+24,vegetarian lasagna,lasagna
+25,lasagna with ground beef,lasagna
+26,chicken tacos,tacos
+27,vegetarian tacos,tacos
+28,quick dinner with tortillas,tacos
+29,caesar salad,caesar_salad
+30,caesar salad with chicken,caesar_salad

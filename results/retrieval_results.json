@@ -1,0 +1,29 @@
+[
+  {
+    "model":"TF-IDF + cosine (stemmed)",
+    "precision":"n\/a",
+    "MRR":0.7453,
+    "Hit_at_5":0.8333,
+    "P_at_5":0.62,
+    "size_mb":0.11,
+    "latency_ms":0.86
+  },
+  {
+    "model":"MiniLM embeddings (BERT-style)",
+    "precision":"fp32",
+    "MRR":0.9524,
+    "Hit_at_5":0.9667,
+    "P_at_5":0.8333,
+    "size_mb":90.89,
+    "latency_ms":14.55
+  },
+  {
+    "model":"MiniLM embeddings (BERT-style)",
+    "precision":"int8",
+    "MRR":0.9364,
+    "Hit_at_5":0.9667,
+    "P_at_5":0.8067,
+    "size_mb":58.63,
+    "latency_ms":8.63
+  }
+]
