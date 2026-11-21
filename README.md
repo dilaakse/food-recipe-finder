@@ -1,6 +1,6 @@
 # Food photo to recipe finder
 
-SWE015 homework – *Building an Intelligent Application* (Use Case 3).
+*Building an Intelligent Application* 
 
 Upload a photo of a dish and describe what you want ("vegetarian, under 30 minutes"). The app
 recognises the dish, shows where the model looked (Grad-CAM) and returns the top-5 matching recipes
@@ -66,10 +66,10 @@ All numbers were measured with the scripts in this repository (`results/*.json`)
 
 | Model | Precision | Top-1 | Top-5 | Size (MB) | Latency (ms) |
 |---|---|---|---|---|---|
-| Small CNN (from scratch) | fp32 | 0.773 | 0.984 | 1.58 | 12.7 |
-| Small CNN (from scratch) | int8 | 0.776 | 0.983 | 0.41 | 10.4 |
-| VGG16 (fine-tuned) | fp32 | 0.904 | 0.994 | 110.27 | 395.0 |
-| VGG16 (fine-tuned) | int8 | 0.904 | 0.994 | 27.68 | 249.5 |
+| Small CNN (from scratch) | fp32 | 0.773 | 0.984 | 1.58 | 13.3 |
+| Small CNN (from scratch) | int8 | 0.776 | 0.983 | 0.41 | 8.0 |
+| VGG16 (fine-tuned) | fp32 | 0.904 | 0.994 | 110.27 | 432.1 |
+| VGG16 (fine-tuned) | int8 | 0.904 | 0.994 | 27.68 | 281.3 |
 
 Model selection used the validation set only: small CNN 0.709 (20 epochs) → 0.762 (40 epochs, used); VGG16 feature
 extraction 0.848 → fine-tuning 0.886.
@@ -78,11 +78,13 @@ extraction 0.848 → fine-tuning 0.886.
 
 | Model | Precision | MRR | Hit@5 | P@5 | Size (MB) | Latency per query (ms) |
 |---|---|---|---|---|---|---|
-| TF-IDF + cosine (stemmed) | – | 0.745 | 0.833 | 0.620 | 0.11 | 0.86 |
-| MiniLM embeddings | fp32 | 0.952 | 0.967 | 0.833 | 90.89 | 14.55 |
-| MiniLM embeddings | int8 | 0.936 | 0.967 | 0.807 | 58.63 | 8.63 |
+| TF-IDF + cosine (stemmed) | – | 0.745 | 0.833 | 0.620 | 0.11 | 0.74 |
+| MiniLM embeddings | fp32 | 0.952 | 0.967 | 0.833 | 90.89 | 18.27 |
+| MiniLM embeddings | int8 | 0.936 | 0.967 | 0.787 | 58.63 | 14.24 |
 
 Recall@5 is not used because it is capped when many recipes are relevant to a query (e.g. 36 for "pizza recipe").
+Across two runs in different Colab sessions the TF-IDF and fp32 numbers were identical, the INT8 numbers differed slightly
+(P@5 0.807 vs. 0.787) and latencies varied by 10–40 %; the tables above are from the last run.
 
 ## Reproduce everything
 
