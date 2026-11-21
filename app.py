@@ -49,11 +49,11 @@ def search_table(retriever, query, constraints, use_filter, k=5):
     ranked = apply_filters(raw, constraints, recipes) if use_filter else raw
     order = np.argsort(-ranked)[:k]
     return pd.DataFrame({
+        "similarity": raw[order].round(3),
         "recipe": recipes["title"].values[order],
-        "dish": [pretty(d) for d in recipes["dish"].values[order]],
         "minutes": recipes["total_min"].values[order],
         "vegetarian": recipes["is_vegetarian"].values[order],
-        "similarity": raw[order].round(3),
+        "dish": [pretty(d) for d in recipes["dish"].values[order]],
     })
 
 
@@ -74,11 +74,13 @@ def run(image, text, add_dish, use_filter):
         heat = overlay_heatmap(shown, cam)
         timing.append(f"Grad-CAM (float VGG16): {(time.perf_counter() - t0) * 1000:.0f} ms")
 
+    if dish and dish in (text or "").lower():       # the user already named the dish
+        dish = ""
     query = f"{dish} {text or ''}".strip()
     if not query:
         return label, heat, "Upload a photo and/or type a request.", None, None, "  \n".join(timing)
 
-    constraints = extract_constraints(query)
+    constraints = extract_constraints(qp.normalize(query))   # extracted after spelling correction
     info = (f"**Query used:** `{query}`  \n**After normalisation / spelling correction:** "
             f"`{qp.normalize(query)}`  \n**Extracted constraints:** `{constraints or 'none'}`"
             f"{'  (applied as filters)' if use_filter and constraints else ''}")
@@ -104,9 +106,8 @@ with gr.Blocks(title="Food photo to recipe finder") as demo:
             label = gr.Label(num_top_classes=3, label="Recognised dish (VGG16, INT8)")
             heat = gr.Image(label="Grad-CAM: where the model looked (explains the INT8 prediction)")
     info = gr.Markdown()
-    with gr.Row():
-        t_dense = gr.Dataframe(label="Top-5 recipes: MiniLM sentence embeddings (INT8)")
-        t_tfidf = gr.Dataframe(label="Top-5 recipes: TF-IDF baseline")
+    t_dense = gr.Dataframe(label="Top-5 recipes: MiniLM sentence embeddings (INT8)", wrap=True)
+    t_tfidf = gr.Dataframe(label="Top-5 recipes: TF-IDF baseline", wrap=True)
     timing = gr.Markdown()
     btn.click(run, [img, txt, add, flt], [label, heat, info, t_dense, t_tfidf, timing])
 
