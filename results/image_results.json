@@ -5,7 +5,7 @@
     "top1":0.7732,
     "top5":0.9836,
     "size_mb":1.581977,
-    "latency_ms":12.71046913
+    "latency_ms":13.29797078
   },
   {
     "model":"Small CNN v2",
@@ -13,7 +13,7 @@
     "top1":0.776,
     "top5":0.9832,
     "size_mb":0.411485,
-    "latency_ms":10.42055378
+    "latency_ms":8.03452162
   },
   {
     "model":"VGG16 fine-tuned",
@@ -21,7 +21,7 @@
     "top1":0.9036,
     "top5":0.9936,
     "size_mb":110.272409,
-    "latency_ms":394.97985183
+    "latency_ms":432.05382548
   },
   {
     "model":"VGG16 fine-tuned",
@@ -29,6 +29,6 @@
     "top1":0.904,
     "top5":0.994,
     "size_mb":27.683863,
-    "latency_ms":249.53151847
+    "latency_ms":281.29889871
   }
 ]

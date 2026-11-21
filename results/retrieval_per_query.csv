@@ -1,0 +1,31 @@
+query_id,query,tfidf_rank,tfidf_top1,int8_rank,int8_top1
+1,pizza recipe,1,Taco Pizza,1,Easy Pizza
+2,vegetarian pizza,1,Goat Cheese Gourmet Vegetarian Pizza,1,The Farmers Vegetarian Pizza
+3,lasagna recipe,1,Noah's Lasagna,1,Lasagna
+4,vegan chocolate cake,2,5 Minute Chocolate Cake,1,Vegan Chocolate Cake
+5,omelette recipe,1,Spanish Tortilla (Potato Omelette),1,Oven Baked Omelet
+6,quick omelette,3,Cornmeal Pancakes,1,Souffle Omelet (Puffy Omelet)
+7,easy tacos recipe,2,Taco Pizza,1,Tacos: for Vegetarians and Non-Vegetarians
+8,quick pizza under 30 minutes,6,5 Minute Chocolate Cake,2,Bubble Pizza
+9,piza recipe,1,Taco Pizza,1,Easy Pizza
+10,classic hamburger recipe,1,Amy's Spicy Hamburgers,1,Hamburger Patties
+11,juicy beef burger on the grill,2,Beef And Pork Burgers,2,Easy Honey Ranch Burgers
+12,vegetarian burger,14,Tacos: for Vegetarians and Non-Vegetarians,1,Live Garden Burger (Raw Foods)
+13,fluffy pancakes,1,Fluffy Autumn Pun-Cakes! ( Pumpkin Pancakes ),1,Pete's Scratch Pancakes
+14,pancakes under 20 minutes,7,5 Minute Chocolate Cake,1,Pancakes for One or Two
+15,vegan pancakes,1,Vegan Lemon Pancakes,1,Basic Vegan Pancakes for One
+16,homemade vanilla ice cream,1,Homemade Ice Cream - Custard Based,1,Homemade Ice Cream - Custard Based
+17,chocolate ice cream,1,Jerry's Chocolate Ice Cream,1,Jerry's Chocolate Ice Cream
+18,dairy free ice cream,1,Dairy Free Peach Ice Cream,1,Fruit Ice Cream (Dairy-Free &amp; Raw Food)
+19,something sweet and cold,22,Frangelico Chocolate Cake,1,Ice Cream in a Ziplock Bag
+20,crispy french fries,1,Crispy Spicy French Fries,1,Crispy Spicy French Fries
+21,oven baked french fries,2,Garlic Fries,1,Delicious Oven French Fries
+22,omelette with mushrooms,1,Mushroom Omelette,1,Mushroom Omelette
+23,easy chocolate cake,2,5 Minute Chocolate Cake,1,Easy Bake Oven Chocolate Cake
+24,vegetarian lasagna,1,Vegetarian Lasagna,1,Vegetarian Lasagna
+25,lasagna with ground beef,1,Noah's Lasagna,1,Noah's Lasagna
+26,chicken tacos,1,Easy Taco Salsa Chicken  Breasts,1,Chicken-Ranch Tacos
+27,vegetarian tacos,1,Tacos: for Vegetarians and Non-Vegetarians,1,Tacos: for Vegetarians and Non-Vegetarians
+28,quick dinner with tortillas,10,Cornmeal Pancakes,13,Taco Pizza
+29,caesar salad,1,Easy Chicken Caesar Salad,1,Traditional Caesar Salad
+30,caesar salad with chicken,1,Easy Chicken Caesar Salad,1,Chicken Caesar Salad With Asparagus
