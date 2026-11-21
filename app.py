@@ -1,4 +1,4 @@
-"""Food photo -> recipe finder (Gradio app).
+"""Dish Detective - food photo -> recipe finder (Gradio app).
 
 Run:  python app.py            (add --share for a public link, e.g. in Colab)
 
@@ -8,6 +8,7 @@ Pipeline
          -> MiniLM sentence embeddings (INT8)  and  TF-IDF baseline  -> top-5 recipes each
 """
 import argparse
+import html
 import time
 
 import gradio as gr
@@ -44,10 +45,14 @@ dense_int8 = DenseRetriever(recipes, qp, quantize=True)
 pretty = lambda c: c.replace("_", " ")
 
 
-def search_table(retriever, query, constraints, use_filter, k=5):
+def search(retriever, query, constraints, use_filter, k=5):
+    """Return (row positions, raw similarity scores) of the top-k recipes."""
     raw = retriever.scores(query)
     ranked = apply_filters(raw, constraints, recipes) if use_filter else raw
-    order = np.argsort(-ranked)[:k]
+    return np.argsort(-ranked)[:k], raw
+
+
+def search_table(order, raw):
     return pd.DataFrame({
         "similarity": raw[order].astype(float).round(3),
         "recipe": recipes["title"].values[order],
@@ -55,6 +60,27 @@ def search_table(retriever, query, constraints, use_filter, k=5):
         "veg": recipes["is_vegetarian"].values[order],
         "dish": [pretty(d) for d in recipes["dish"].values[order]],
     })
+
+
+def recipe_cards(order, raw):
+    """Recipe results as expandable cards: click a card to read ingredients and steps."""
+    if len(order) == 0:
+        return "<p>No recipes found.</p>"
+    cards = []
+    for i in order:
+        r = recipes.iloc[i]
+        badges = f"⏱ {int(r['total_min'])} min" + ("  ·  🌱 vegetarian" if r["is_vegetarian"] else "")
+        ingredients = "".join(f"<li>{html.escape(x.strip())}</li>" for x in str(r["ingredients"]).split(";") if x.strip())
+        cards.append(
+            "<details style='border:1px solid var(--border-color-primary);border-radius:10px;"
+            "padding:10px 14px;margin:8px 0;background:var(--background-fill-secondary)'>"
+            "<summary style='cursor:pointer;font-weight:600;font-size:1.05em'>"
+            f"{html.escape(str(r['title']))}"
+            f"<span style='font-weight:400;opacity:.7;font-size:.85em;margin-left:10px'>{badges}"
+            f"  ·  match {raw[i]:.2f}</span></summary>"
+            f"<div style='margin-top:10px'><b>Ingredients</b><ul>{ingredients}</ul>"
+            f"<b>Directions</b><p>{html.escape(str(r['instructions']))}</p></div></details>")
+    return "".join(cards)
 
 
 def run(image, text, add_dish, use_filter):
@@ -79,22 +105,22 @@ def run(image, text, add_dish, use_filter):
         dish = ""
     query = f"{dish} {text or ''}".strip()
     if not query:
-        return label, heat, "Upload a photo and/or type a request.", None, None, "  \n".join(timing)
+        return label, heat, "Upload a photo and/or type a request.", "", None, "  \n".join(timing)
 
     constraints = extract_constraints(qp.normalize(query))   # extracted after spelling correction
     info = (f"**Search text:** `{query}`  \n**After spelling correction:** `{qp.normalize(query)}`  \n"
             f"**Detected preferences:** `{constraints or 'none'}`"
             f"{'  (used as filters)' if use_filter and constraints else ''}")
-    tables = []
+    results = []
     for name, retriever in (("MiniLM INT8", dense_int8), ("TF-IDF", tfidf)):
         t0 = time.perf_counter()
-        tables.append(search_table(retriever, query, constraints, use_filter))
+        results.append(search(retriever, query, constraints, use_filter))
         timing.append(f"retrieval ({name}): {(time.perf_counter() - t0) * 1000:.1f} ms")
-    return label, heat, info, tables[0], tables[1], "  \n".join(timing)
+    return (label, heat, info, recipe_cards(*results[0]), search_table(*results[1]), "  \n".join(timing))
 
 
-with gr.Blocks(title="Snap & Cook") as demo:
-    gr.Markdown("# 🍽️ Snap & Cook\nTake a photo of a dish, tell us what you feel like cooking "
+with gr.Blocks(title="Dish Detective") as demo:
+    gr.Markdown("# 🕵️ Dish Detective\nTake a photo of a dish, tell us what you feel like cooking "
                 "(for example *vegetarian, under 30 minutes*) and get recipe ideas.")
     with gr.Row():
         with gr.Column():
@@ -106,13 +132,13 @@ with gr.Blocks(title="Snap & Cook") as demo:
         with gr.Column():
             label = gr.Label(num_top_classes=3, label="What we see in your photo (VGG16, INT8)")
             heat = gr.Image(label="What the model looked at (Grad-CAM)")
-    gr.Markdown("### Recipe ideas")
-    t_dense = gr.Dataframe(label="Best matches (MiniLM sentence embeddings, INT8)", wrap=True)
+    gr.Markdown("### Recipe ideas\n*Best matches from MiniLM sentence embeddings (INT8). Click a recipe to open it.*")
+    cards = gr.HTML()
     with gr.Accordion("Behind the scenes: compare with a plain keyword search", open=True):
         info = gr.Markdown()
         t_tfidf = gr.Dataframe(label="Keyword search (TF-IDF baseline)", wrap=True)
         timing = gr.Markdown()
-    btn.click(run, [img, txt, add, flt], [label, heat, info, t_dense, t_tfidf, timing])
+    btn.click(run, [img, txt, add, flt], [label, heat, info, cards, t_tfidf, timing])
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
