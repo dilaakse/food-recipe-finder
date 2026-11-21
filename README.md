@@ -1,6 +1,6 @@
-# Food photo to recipe finder
+# Recipes Through the Lens
 
-*Building an Intelligent Application* 
+*Food photo to recipe finder* –  The app is called **Dish Detective**.
 
 Upload a photo of a dish and describe what you want ("vegetarian, under 30 minutes"). The app
 recognises the dish, shows where the model looked (Grad-CAM) and returns the top-5 matching recipes
