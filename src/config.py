@@ -27,6 +27,6 @@ EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 # Google Drive file ids of the large weight files (see README, "Weights").
 # Share each file with "Anyone with the link" and paste its id here.
 WEIGHT_FILES = {
-    "vgg16_fp32.pt": "<DRIVE_FILE_ID>",
-    "vgg16_int8.ts": "<DRIVE_FILE_ID>",
+    "vgg16_fp32.pt": "1fbmNhOaX9-uovLDuOAjbo2jbtKDflHQB",
+    "vgg16_int8.ts": "19Ni6ReJNY3BBvNaqLf9INvkBz3ePzof7",
 }
