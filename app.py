@@ -49,10 +49,10 @@ def search_table(retriever, query, constraints, use_filter, k=5):
     ranked = apply_filters(raw, constraints, recipes) if use_filter else raw
     order = np.argsort(-ranked)[:k]
     return pd.DataFrame({
-        "similarity": raw[order].round(3),
+        "similarity": raw[order].astype(float).round(3),
         "recipe": recipes["title"].values[order],
-        "minutes": recipes["total_min"].values[order],
-        "vegetarian": recipes["is_vegetarian"].values[order],
+        "min": recipes["total_min"].values[order],
+        "veg": recipes["is_vegetarian"].values[order],
         "dish": [pretty(d) for d in recipes["dish"].values[order]],
     })
 
@@ -66,7 +66,8 @@ def run(image, text, add_dish, use_filter):
             probs = torch.softmax(vgg_int8(x), 1)[0]
         timing.append(f"image classification (INT8 VGG16): {(time.perf_counter() - t0) * 1000:.0f} ms")
         pred = int(probs.argmax())
-        label = {pretty(c): float(p) for c, p in zip(config.CLASSES, probs)}
+        top = sorted(zip(config.CLASSES, probs.tolist()), key=lambda t: -t[1])[:3]
+        label = {pretty(c): p for c, p in top if p >= 0.01} or {pretty(top[0][0]): top[0][1]}   # hide near-0 % classes
         dish = pretty(config.CLASSES[pred]) if add_dish else ""
         t0 = time.perf_counter()
         cam, _, _ = grad_cam(vgg_fp32, x, vgg_fp32.features[30], class_idx=pred)
@@ -81,9 +82,9 @@ def run(image, text, add_dish, use_filter):
         return label, heat, "Upload a photo and/or type a request.", None, None, "  \n".join(timing)
 
     constraints = extract_constraints(qp.normalize(query))   # extracted after spelling correction
-    info = (f"**Query used:** `{query}`  \n**After normalisation / spelling correction:** "
-            f"`{qp.normalize(query)}`  \n**Extracted constraints:** `{constraints or 'none'}`"
-            f"{'  (applied as filters)' if use_filter and constraints else ''}")
+    info = (f"**Search text:** `{query}`  \n**After spelling correction:** `{qp.normalize(query)}`  \n"
+            f"**Detected preferences:** `{constraints or 'none'}`"
+            f"{'  (used as filters)' if use_filter and constraints else ''}")
     tables = []
     for name, retriever in (("MiniLM INT8", dense_int8), ("TF-IDF", tfidf)):
         t0 = time.perf_counter()
@@ -92,23 +93,25 @@ def run(image, text, add_dish, use_filter):
     return label, heat, info, tables[0], tables[1], "  \n".join(timing)
 
 
-with gr.Blocks(title="Food photo to recipe finder") as demo:
-    gr.Markdown("# Food photo to recipe finder\nUpload a dish photo, describe what you want "
-                "(e.g. *vegetarian, under 30 minutes*), and get the top-5 matching recipes.")
+with gr.Blocks(title="Snap & Cook") as demo:
+    gr.Markdown("# 🍽️ Snap & Cook\nTake a photo of a dish, tell us what you feel like cooking "
+                "(for example *vegetarian, under 30 minutes*) and get recipe ideas.")
     with gr.Row():
         with gr.Column():
-            img = gr.Image(type="pil", label="Food photo (optional)")
-            txt = gr.Textbox(label="Your request", placeholder="vegetarian, under 30 minutes")
-            add = gr.Checkbox(True, label="Add the recognised dish to the query")
-            flt = gr.Checkbox(False, label="Apply extracted diet / time constraints as filters")
+            img = gr.Image(type="pil", label="Your dish photo (optional)")
+            txt = gr.Textbox(label="What are you in the mood for?", placeholder="e.g. vegetarian, under 30 minutes")
+            add = gr.Checkbox(True, label="Use the dish in my photo as part of the search")
+            flt = gr.Checkbox(False, label="Only show recipes that match my diet and time limit")
             btn = gr.Button("Find recipes", variant="primary")
         with gr.Column():
-            label = gr.Label(num_top_classes=3, label="Recognised dish (VGG16, INT8)")
-            heat = gr.Image(label="Grad-CAM: where the model looked (explains the INT8 prediction)")
-    info = gr.Markdown()
-    t_dense = gr.Dataframe(label="Top-5 recipes: MiniLM sentence embeddings (INT8)", wrap=True)
-    t_tfidf = gr.Dataframe(label="Top-5 recipes: TF-IDF baseline", wrap=True)
-    timing = gr.Markdown()
+            label = gr.Label(num_top_classes=3, label="What we see in your photo (VGG16, INT8)")
+            heat = gr.Image(label="What the model looked at (Grad-CAM)")
+    gr.Markdown("### Recipe ideas")
+    t_dense = gr.Dataframe(label="Best matches (MiniLM sentence embeddings, INT8)", wrap=True)
+    with gr.Accordion("Behind the scenes: compare with a plain keyword search", open=True):
+        info = gr.Markdown()
+        t_tfidf = gr.Dataframe(label="Keyword search (TF-IDF baseline)", wrap=True)
+        timing = gr.Markdown()
     btn.click(run, [img, txt, add, flt], [label, heat, info, t_dense, t_tfidf, timing])
 
 if __name__ == "__main__":
