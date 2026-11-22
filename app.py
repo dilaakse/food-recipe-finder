@@ -49,7 +49,10 @@ def search(retriever, query, constraints, use_filter, k=5):
     """Return (row positions, raw similarity scores) of the top-k recipes."""
     raw = retriever.scores(query)
     ranked = apply_filters(raw, constraints, recipes) if use_filter else raw
-    return np.argsort(-ranked)[:k], raw
+    order = np.argsort(-ranked)[:k]
+    if use_filter and constraints:
+        order = order[ranked[order] > -5]       # drop recipes that break the time / diet limit
+    return order, raw
 
 
 def search_table(order, raw):
@@ -127,7 +130,7 @@ with gr.Blocks(title="Dish Detective") as demo:
             img = gr.Image(type="pil", label="Your dish photo (optional)")
             txt = gr.Textbox(label="What are you in the mood for?", placeholder="e.g. vegetarian, under 30 minutes")
             add = gr.Checkbox(True, label="Use the dish in my photo as part of the search")
-            flt = gr.Checkbox(False, label="Only show recipes that match my diet and time limit")
+            flt = gr.Checkbox(True, label="Only show recipes that match my diet and time limit")
             btn = gr.Button("Find recipes", variant="primary")
         with gr.Column():
             label = gr.Label(num_top_classes=3, label="What we see in your photo (VGG16, INT8)")
