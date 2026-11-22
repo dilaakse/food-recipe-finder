@@ -1,14 +1,16 @@
-# torch is capped because the INT8 code uses torch.ao.quantization, which PyTorch plans to remove in 2.10
-torch>=2.6,<2.10
-torchvision>=0.21,<0.25
-numpy
-pandas
-scikit-learn
-nltk
-pillow
-matplotlib
-sentence-transformers
-gradio
-gdown
-datasets
+# Tested with Python 3.12 on Google Colab (CPU), versions below.
+# torch is kept on 2.9.x: the INT8 model files were exported with it, and the INT8 code uses
+# torch.ao.quantization, which PyTorch plans to remove in 2.10.
+torch~=2.9.1
+torchvision~=0.24.1
+numpy>=1.26
+pandas>=2.2
+scikit-learn>=1.6
+nltk>=3.9
+pillow>=11.0
+matplotlib>=3.10
+sentence-transformers>=5.0
+gradio>=6.0,<7
+gdown>=5.2
+datasets>=4.0
 huggingface_hub

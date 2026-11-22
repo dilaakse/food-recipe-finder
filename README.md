@@ -1,6 +1,6 @@
 # Recipes Through the Lens
 
-*Food photo to recipe finder* –  The app is called **Dish Detective**.
+*Food photo to recipe finder.* The app itself is called **Dish Detective**.
 
 Upload a photo of a dish and describe what you want ("vegetarian, under 30 minutes"). The app
 recognises the dish, shows where the model looked (Grad-CAM) and returns the top-5 matching recipes
@@ -12,7 +12,7 @@ with similarity scores. The photo model and the text model both run as **INT8-qu
 git clone https://github.com/dilaakse/food-recipe-finder
 cd food-recipe-finder
 python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+pip install -r requirements.txt   # tested: torch 2.9.1, torchvision 0.24.1, gradio 6.31.0, sentence-transformers 5.7.0
 python app.py
 ```
 
