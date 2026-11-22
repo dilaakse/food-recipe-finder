@@ -57,6 +57,25 @@ heatmap is computed on the float copy of the same network for the class predicte
 * **Embedding model:** `sentence-transformers/all-MiniLM-L6-v2` (Reimers & Gurevych, 2019; Wang et al., 2020).
 * VGG16: Simonyan & Zisserman, 2015 (ImageNet weights from torchvision). Grad-CAM: Selvaraju et al., 2017.
 
+## Evaluation protocol
+
+The task has two inputs (a photo and a text request), so the models are compared in two groups. Inside each group
+every model is evaluated on exactly the same held-out test set, with the same metrics and the same hardware.
+
+| Step of the model ladder | Dish recognition (photo) | Recipe search (text) |
+|---|---|---|
+| 1. Classical baseline | – | TF-IDF + cosine (stemmed) |
+| 2. Neural network trained by us | Small CNN from scratch; VGG16 fine-tuned (transfer learning) | – |
+| 3. Transformer | – | MiniLM sentence embeddings (fp32) |
+| 4. Quantized model | Small CNN INT8, VGG16 INT8 (static) | MiniLM INT8 (dynamic) |
+| **Test set** | 2,500 official Food-101 test photos (10 classes), never used for training or model selection | 30 test queries with hand-reviewed relevant recipes (`data/qrels.csv`) over 342 recipes |
+| **Metrics** | top-1 and top-5 accuracy | MRR, Hit@5, P@5 |
+| **Efficiency** | model size (MB) and latency (ms), CPU, batch size 1, mean of 100 runs | model size (MB) and latency per query (ms), same CPU |
+
+Model selection (number of epochs, fine-tuning) used the validation set only. Each quantized model is compared with its
+own fp32 version on the same test set. The image models and the text models cannot share one test set because they take
+different inputs, which is why the two groups have separate test sets.
+
 ## Results
 
 All numbers were measured with the scripts in this repository (`results/*.json`). Latency: CPU, batch size 1, mean of
